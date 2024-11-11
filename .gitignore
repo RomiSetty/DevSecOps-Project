@@ -1,2 +1,67 @@
-__pycache__
-venv
+# Byte-compiled files
+_pycache_/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+*.out
+*.err
+
+# Config and environment files
+.env
+*.ini
+*.cfg
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Coverage reports
+htmlcov/
+.coverage
+*.cover
+*.py,cover
+
+# Testing outputs
+.tox/
+.nox/
+*.testresult
+.cache/
+pytest_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Packaging files
+*.wheel
+*.egg
+.Python
+pip-log.txt
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Deployment and CI/CD
+*.bak
+*.pid
+
