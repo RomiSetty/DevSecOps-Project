@@ -37,7 +37,9 @@ pipeline {
             }
             steps {
                 echo "Running tests for ${env.BRANCH_NAME}"
-                sh 'docker run --rm flask-app pytest'
+                sh '''
+                docker run --rm -e PYTHONPATH=/app flask-app pytest
+                '''
             }
         }
 
