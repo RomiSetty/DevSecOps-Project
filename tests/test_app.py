@@ -8,9 +8,17 @@ def client() -> FlaskClient:
     app = Flask(__name__)
 
     # Define a simple route for testing
-    @app.route('/goals')
+    @app.route('/goals', methods=['GET'])
     def list_goals():
         return "<ul><li>Goal 1</li><li>Goal 2</li></ul>", 200
+
+    @app.route('/goals', methods=['POST'])
+    def add_goal():
+        data = request.json
+        if "title" not in data or "description" not in data:
+            return jsonify({"error": "Title and description required"}), 400
+        goal = tracker.add_goal(data["title"], data["description"])
+        return jsonify(goal.to_dict()), 201
 
     # Create the test client
     with app.test_client() as client:
