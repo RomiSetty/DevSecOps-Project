@@ -31,12 +31,25 @@ def test_list_goals(client):
     assert "<li>Goal 2</li>" in response.data.decode('utf-8')
 
 def test_show_goal_details(client):
-    # You can modify this test similarly if you have another route that returns HTML content
-    response = client.get('/goal/1')  # Assuming you have a /goal/<id> route
+    # First, add a goal so it exists in the tracker
+    data = {
+        "title": "Goal 1",
+        "description": "Description for Goal 1"
+    }
+    response = client.post('/goals', json=data)
 
-    # Check if the response is HTML
-    assert 'text/html' in response.content_type
+    # Ensure the goal was created successfully
+    assert response.status_code == 201
+    goal_data = response.get_json()
+    
+    # Now test retrieving the goal details by its ID (goal_id = 0)
+    response = client.get(f'/goals/{goal_data["id"]}')  # Use the ID from the created goal
+
+    # Assert the response status code is 200
     assert response.status_code == 200
 
-    # Modify to check for specific content based on the response
-    assert "<h1>Goal 1 Details</h1>" in response.data.decode('utf-8')
+    # Assert the response contains the goal's details
+    response_json = response.get_json()
+    assert response_json["title"] == "Goal 1"
+    assert response_json["description"] == "Description for Goal 1"
+    assert response_json["completed"] == False
