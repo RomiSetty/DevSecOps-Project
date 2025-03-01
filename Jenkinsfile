@@ -17,6 +17,7 @@ pipeline {
                         docker stop $CONTAINER_ID
                         docker rm $CONTAINER_ID
                     fi
+                    docker system prune -f # Remove unused images, containers, and volumes
                     '''
                 }
             }
