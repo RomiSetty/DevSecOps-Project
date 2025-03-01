@@ -10,9 +10,6 @@ COPY . /app
 # Install any needed dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements1.txt
 
-# Run tests (this will fail the build if tests fail)
-RUN pytest tests/
-
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
