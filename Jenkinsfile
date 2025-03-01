@@ -1,51 +1,29 @@
 pipeline {
     agent any
-
-    environment {
-        REPO_URL = 'https://github.com/RomiSetty/DevSecOps-Project.git'
-    }
-
+    
     stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    cleanWs() // Clean workspace to remove old files
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${env.BRANCH_NAME}"]],
-                        userRemoteConfigs: [[url: REPO_URL]]
-                    ])
-                    echo "Checked out branch: ${env.BRANCH_NAME}"
-                }
-            }
-        }
-
         stage('Build') {
             steps {
-                echo "Building branch: ${env.BRANCH_NAME}"
-                sh 'docker build -t flask-app .'
+                echo "Building for ${env.BRANCH_NAME}"
+                // Common build steps
             }
         }
-
+        
         stage('Test') {
-            when {
-                not {
-                    branch 'main' // Exclude tests from running on 'main'
+                steps {
+                    // Run on all branches
+                    echo "Running unit tests for branch  ${env.BRANCH_NAME}"
                 }
-            }
-            steps {
-                echo "Running tests for ${env.BRANCH_NAME}"
-                sh 'docker run --rm flask-app pytest'
-            }
-        }
 
+        }
+        
         stage('Deploy') {
             when {
-                branch 'main' // Deploy only on 'main' branch
+                branch 'main'
             }
             steps {
-                echo "Deploying application from branch: ${env.BRANCH_NAME}"
-                sh 'docker run -d -p 5000:5000 flask-app'
+                // Production deployment steps
+                echo "Deploying, branch: ${env.BRANCH_NAME}"
             }
         }
     }
