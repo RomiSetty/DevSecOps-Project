@@ -5,6 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building for ${env.BRANCH_NAME}"
+                sh 'docker build -t flask-app .'
                 // Common build steps
             }
         }
