@@ -6,16 +6,18 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clean Up Old Containers') {
             steps {
                 script {
-                    cleanWs() // Clean workspace to remove old files
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${env.BRANCH_NAME}"]],
-                        userRemoteConfigs: [[url: REPO_URL]]
-                    ])
-                    echo "Checked out branch: ${env.BRANCH_NAME}"
+                    // Check if any container is using port 5000 and stop it
+                    sh '''
+                    CONTAINER_ID=$(docker ps -q --filter "expose=5000")
+                    if [ ! -z "$CONTAINER_ID" ]; then
+                        echo "Stopping container using port 5000: $CONTAINER_ID"
+                        docker stop $CONTAINER_ID
+                        docker rm $CONTAINER_ID
+                    fi
+                    '''
                 }
             }
         }
