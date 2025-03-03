@@ -4,16 +4,19 @@ app = Flask(__name__)
 
 # Goal class
 class Goal:
-    def __init__(self, title, description):
+    def __init__(self, title, description, id=None):
+        self.id = id if id else self.generate_id()  # Unique ID
         self.title = title
         self.description = description
         self.completed = False
 
-    def mark_completed(self):
-        self.completed = True
+    def generate_id(self):
+        import uuid
+        return str(uuid.uuid4())  # Generate a unique identifier using UUID
 
     def to_dict(self):
         return {
+            "id": self.id,
             "title": self.title,
             "description": self.description,
             "completed": self.completed
@@ -32,26 +35,33 @@ class GoalTracker:
     def list_goals(self):
         return [goal.to_dict() for goal in self.goals]
 
-    def mark_goal_completed(self, index):
-        if 0 <= index < len(self.goals):
-            self.goals[index].mark_completed()
+    def mark_goal_completed(self, goal_id):
+        goal = self.get_goal_by_id(goal_id)
+        if goal:
+            goal.mark_completed()
             return True
         return False
 
-    def delete_goal(self, index):
-        if 0 <= index < len(self.goals):
-            return self.goals.pop(index)
+    def delete_goal(self, goal_id):
+        goal = self.get_goal_by_id(goal_id)
+        if goal:
+            self.goals.remove(goal)
+            return goal
         return None
 
-    def show_goal_details(self, index):
-        if 0 <= index < len(self.goals):
-            return self.goals[index].to_dict()
+    def show_goal_details(self, goal_id):
+        goal = self.get_goal_by_id(goal_id)
+        if goal:
+            return goal.to_dict()
         return None
+
+    def get_goal_by_id(self, goal_id):
+        return next((goal for goal in self.goals if goal.id == goal_id), None)
 
 # Initialize Goal Tracker
 tracker = GoalTracker()
 
-# Routes
+# Home route
 @app.route('/')
 def home():
     return "Welcome to the Goal Tracking API!"
@@ -66,6 +76,7 @@ def list_goals():
     goals_html += '</ul>'
     return render_template_string(goals_html)
 
+# Add a new goal
 @app.route('/goals', methods=['POST'])
 def add_goal():
     data = request.json
@@ -74,25 +85,28 @@ def add_goal():
     goal = tracker.add_goal(data["title"], data["description"])
     return jsonify(goal.to_dict()), 201
 
-@app.route('/goals/<int:goal_id>', methods=['PUT'])
+# Mark a goal as completed
+@app.route('/goals/<string:goal_id>', methods=['PUT'])
 def mark_goal_completed(goal_id):
     if tracker.mark_goal_completed(goal_id):
         return jsonify({"message": "Goal marked as completed"})
-    return jsonify({"error": "Invalid goal ID"}), 404
+    return jsonify({"error": f"Goal with ID {goal_id} not found"}), 404
 
-@app.route('/goals/<int:goal_id>', methods=['DELETE'])
+# Delete a goal
+@app.route('/goals/<string:goal_id>', methods=['DELETE'])
 def delete_goal(goal_id):
     goal = tracker.delete_goal(goal_id)
     if goal:
         return jsonify({"message": f"Goal '{goal.title}' deleted"})
-    return jsonify({"error": "Invalid goal ID"}), 404
+    return jsonify({"error": f"Goal with ID {goal_id} not found"}), 404
 
-@app.route('/goals/<int:goal_id>', methods=['GET'])
+# Show goal details
+@app.route('/goals/<string:goal_id>', methods=['GET'])
 def show_goal_details(goal_id):
     goal = tracker.show_goal_details(goal_id)
     if goal:
         return jsonify(goal)
-    return jsonify({"error": "Invalid goal ID"}), 404
+    return jsonify({"error": f"Goal with ID {goal_id} not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
