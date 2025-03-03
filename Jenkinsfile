@@ -17,6 +17,7 @@ pipeline {
                         docker stop $CONTAINER_ID
                         docker rm $CONTAINER_ID
                     fi
+                    docker system prune -f # Remove unused images, containers, and volumes
                     '''
                 }
             }
@@ -37,7 +38,9 @@ pipeline {
             }
             steps {
                 echo "Running tests for ${env.BRANCH_NAME}"
-                sh 'docker run --rm flask-app pytest'
+                sh '''
+                docker run --rm -e PYTHONPATH=/app flask-app pytest
+                '''
             }
         }
 

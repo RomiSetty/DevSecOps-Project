@@ -4,11 +4,17 @@ FROM python:3.10-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Copy only the requirements file first to leverage Docker cache
+COPY requirements.txt /app/
+
+# Install dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Now copy the rest of the application files
 COPY . /app
 
-# Install any needed dependencies from requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Set PYTHONPATH to the app directory
+ENV PYTHONPATH=/app
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
