@@ -50,7 +50,7 @@ pipeline {
             }
             steps {
                 echo "Deploying application from branch: ${env.BRANCH_NAME}"
-                sh 'docker run -d -p 5000:5000 flask-app'
+                sh 'docker run -d -p 5000:5000 --network=host flask-app'
             }
         }
     }
