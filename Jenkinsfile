@@ -4,7 +4,7 @@ pipeline {
     environment {
         REPO_URL = 'https://github.com/RomiSetty/DevSecOps-Project.git'
         DOCKERHUB_USERNAME = 'romisetty'  // Replace with your Docker Hub username
-        DOCKERHUB_REPO = 'project/flask-app' // Replace with your repo name
+        DOCKERHUB_REPO = 'romisetty/project' // Replace with your repo name
     }
 
     stages {
