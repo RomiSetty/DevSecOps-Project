@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/RomiSetty/DevSecOps-Project.git'
+        DOCKERHUB_USERNAME = 'romisetty'  // Replace with your Docker Hub username
+        DOCKERHUB_REPO = 'project/flask-app' // Replace with your repo name
     }
 
     stages {
@@ -41,6 +43,22 @@ pipeline {
                 sh '''
                 docker run --rm -e PYTHONPATH=/app flask-app pytest
                 '''
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            when {
+                branch 'main' // Push only when merging to main
+            }
+            steps {
+                script {
+                    sh """
+                    echo 'Logging into Docker Hub...'
+                    echo '${DOCKERHUB_PASSWORD}' | docker login -u '${DOCKERHUB_USERNAME}' --password-stdin
+                    docker tag flask-app ${DOCKERHUB_REPO}:latest
+                    docker push ${DOCKERHUB_REPO}:latest
+                    """
+                }
             }
         }
 
