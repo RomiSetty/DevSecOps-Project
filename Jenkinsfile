@@ -52,12 +52,14 @@ pipeline {
             }
             steps {
                 script {
-                    sh """
-                    echo 'Logging into Docker Hub...'
-                    echo '${DOCKERHUB_PASSWORD}' | docker login -u '${DOCKERHUB_USERNAME}' --password-stdin
-                    docker tag flask-app ${DOCKERHUB_REPO}:latest
-                    docker push ${DOCKERHUB_REPO}:latest
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh """
+                        echo 'Logging into Docker Hub...'
+                        docker login -u '${DOCKERHUB_USERNAME}' -p '${DOCKERHUB_PASSWORD}'
+                        docker tag flask-app ${DOCKERHUB_REPO}:latest
+                        docker push ${DOCKERHUB_REPO}:latest
+                        """
+                    }
                 }
             }
         }
