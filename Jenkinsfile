@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'https://github.com/RomiSetty/DevSecOps-Project.git'
         DOCKERHUB_USERNAME = 'romisetty'  // Replace with your Docker Hub username
         DOCKERHUB_REPO = 'romisetty/project' // Replace with your repo name
     }
@@ -33,16 +32,9 @@ pipeline {
         }
 
         stage('Test') {
-            when {
-                not {
-                    branch 'main' // Exclude tests from running on 'main'
-                }
-            }
             steps {
                 echo "Running tests for ${env.BRANCH_NAME}"
-                sh '''
-                docker run --rm -e PYTHONPATH=/app flask-app pytest
-                '''
+                sh "docker run --rm -e PYTHONPATH=/app flask-app pytest"
             }
         }
 
@@ -52,12 +44,13 @@ pipeline {
             }
             steps {
                 script {
+                    def currentDate = new Date().format("yyyy-MM-dd HH:mm")
                     withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh """
                         echo 'Logging into Docker Hub...'
                         docker login -u '${DOCKERHUB_USERNAME}' -p '${DOCKERHUB_PASSWORD}'
-                        docker tag flask-app ${DOCKERHUB_REPO}:latest
-                        docker push ${DOCKERHUB_REPO}:latest
+                        docker tag flask-app ${DOCKERHUB_REPO}:${currentDate}
+                        docker push ${DOCKERHUB_REPO}:${currentDate}
                         """
                     }
                 }
@@ -70,7 +63,8 @@ pipeline {
             }
             steps {
                 echo "Deploying application from branch: ${env.BRANCH_NAME}"
-                sh 'docker run -d -p 5000:5000 --network=host flask-app'
+                //manual deploy for now
+                // other options : AWS on EC2 OR EKS using terraform.
             }
         }
     }
