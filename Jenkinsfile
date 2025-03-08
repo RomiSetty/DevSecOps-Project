@@ -44,7 +44,7 @@ pipeline {
             }
             steps {
                 script {
-                    def currentDate = new Date().format("yyyy-MM-dd-HH:mm")
+                     def currentDate = new Date().format("yyyy-MM-dd-HHmm") 
                     withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh """
                         echo 'Logging into Docker Hub...'
