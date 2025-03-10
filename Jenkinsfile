@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = 'romisetty'  // Replace with your Docker Hub username
-        DOCKERHUB_REPO = 'romisetty/project' // Replace with your repo name
+        DOCKERHUB_USERNAME = 'romisetty'  
+        DOCKERHUB_REPO = 'romisetty/project' 
     }
 
     stages {
@@ -40,7 +40,7 @@ pipeline {
 
         stage('Push to Docker Hub') {
             when {
-                branch 'main' // Push only when merging to main
+                branch 'main' 
             }
             steps {
                 script {
@@ -59,7 +59,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                branch 'main' // Deploy only on 'main' branch
+                branch 'main' 
             }
             steps {
                 echo "Deploying application from branch: ${env.BRANCH_NAME}"
